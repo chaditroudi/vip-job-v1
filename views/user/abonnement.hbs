@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+</head>
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
+  <!-- Éléments d'arrière-plan -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="animate-pulse-slow absolute top-20 -left-32 w-96 h-96 bg-gray-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+    <div class="animate-pulse-slow animation-delay-2000 absolute bottom-20 -right-32 w-96 h-96 bg-gray-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+  </div>
+  
+  <!-- Header -->
+      {{> header1 }} <!-- Include header partial -->
+
+  <div class="max-w-6xl mx-auto mt-20">
+
+  <h1 class="text-3xl font-bold text-center mb-11 text-blue-900">Gestion de votre Abonnement SMS</h1>
+  
+  {{#if message}}
+    <div class="{{#if success}}bg-green-100 text-green-800 border-green-500{{else}}bg-red-100 text-red-800 border-red-500{{/if}} border-l-4 p-4 mb-6 rounded-md">
+      <p>{{message}}</p>
+    </div>
+  {{/if}}
+  
+  {{#if hasActiveSubscription}}
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded-md">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <i class="fas fa-check-circle text-green-500 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-lg font-medium">
+            Vous êtes actuellement abonné jusqu'au {{formatDate subscription.date_fin}}
+          </p>
+          <p class="text-sm">
+            Montant: {{formatPrice subscription.montant}} DT
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Détails de votre abonnement</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <p class="text-sm text-gray-500">Date de début</p>
+          <p class="text-lg font-medium">{{formatDate subscription.date_debut}}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Date de fin</p>
+          <p class="text-lg font-medium">{{formatDate subscription.date_fin}}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Montant</p>
+          <p class="text-lg font-medium">{{formatPrice subscription.montant}} DT</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Type d'abonnement</p>
+          <p class="text-lg font-medium capitalize">{{subscription.type_abonnement}}</p>
+        </div>
+      </div>
+      
+      <button id="unsubscribeBtn" class="mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-lg transition shadow-md">
+        Se désabonner
+      </button>
+    </div>
+  {{/if}}
+  
+  <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Nos Formules d'Abonnement</h2>
+  
+  <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <!-- Plan Mensuel -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-primary-400 hover:shadow-xl transition-shadow relative">
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Mensuel</h3>
+        <div class="text-3xl font-bold text-primary-600 mb-4">5 DT <span class="text-sm text-gray-500 font-normal">/mois</span></div>
+        <ul class="mb-6 space-y-2">
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Alertes SMS illimitées</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Jusqu'à 3 critères de recherche</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Annulable à tout moment</span>
+          </li>
+        </ul>
+        
+        {{#unless hasActiveSubscription}}
+          <button 
+            data-plan="1"
+            data-price="5"
+            data-name="Mensuel"
+            class="subscribe-btn mt-6 bg-gray-900 hover:bg-gray-700 text-white px-6 py-3 rounded-lg w-full text-xl transition shadow-md"
+          >
+            S'abonner
+          </button>
+        {{/unless}}
+      </div>
+    </div>
+
+    <!-- Plan Trimestriel -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-primary-600 transform scale-105 hover:shadow-xl transition-shadow relative">
+      <div class="bg-primary-600 text-white text-center py-1 text-sm font-medium">POPULAIRE</div>
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Trimestriel</h3>
+        <div class="text-3xl font-bold text-primary-600 mb-4">12 DT <span class="text-sm text-gray-500 font-normal">/trimestre</span></div>
+        <ul class="mb-6 space-y-2">
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Alertes SMS illimitées</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Jusqu'à 5 critères de recherche</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Économisez 20%</span>
+          </li>
+        </ul>
+        
+        {{#unless hasActiveSubscription}}
+          <button 
+            data-plan="3"
+            data-price="12"
+            data-name="Trimestriel"
+            class="subscribe-btn mt-6 bg-gray-900 hover:bg-gray-700 text-white px-6 py-3 rounded-lg w-full text-xl transition shadow-md"
+          >
+            S'abonner
+          </button>
+        {{/unless}}
+      </div>
+    </div>
+
+    <!-- Plan Annuel -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-primary-400 hover:shadow-xl transition-shadow relative">
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Annuel</h3>
+        <div class="text-3xl font-bold text-primary-600 mb-4">40 DT <span class="text-sm text-gray-500 font-normal">/an</span></div>
+        <ul class="mb-6 space-y-2">
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Alertes SMS illimitées</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Jusqu'à 10 critères de recherche</span>
+          </li>
+          <li class="flex items-center">
+            <i class="fas fa-check text-green-500 mr-2"></i>
+            <span>Économisez 33%</span>
+          </li>
+        </ul>
+        
+        {{#unless hasActiveSubscription}}
+          <button 
+            data-plan="12"
+            data-price="40"
+            data-name="Annuel"
+            class="subscribe-btn mt-6 bg-gray-900 hover:bg-gray-700 text-white px-6 py-3 rounded-lg w-full text-xl transition shadow-md"
+          >
+            S'abonner
+          </button>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de confirmation -->
+  <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full">
+      <h3 class="text-2xl font-bold text-gray-800 mb-4" id="modalTitle">Confirmation</h3>
+      <p class="text-gray-700 text-lg mb-6" id="modalMessage">Êtes-vous sûr de vouloir continuer ?</p>
+      <div class="flex justify-end space-x-4">
+        <button id="cancelModalBtn" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg text-gray-800 transition">
+          Annuler
+        </button>
+        <button id="confirmModalBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition">
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const button = document.getElementById('profileButton');
+    const menu = document.getElementById('menu');
+
+    button.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+
+    // Fermer le menu si on clique ailleurs
+    document.addEventListener('click', (event) => {
+      if (!button.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+    
+  document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du modal de confirmation
+    const confirmationModal = document.getElementById('confirmationModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const confirmModalBtn = document.getElementById('confirmModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    
+    // Boutons d'abonnement et de désabonnement
+    const subscribeButtons = document.querySelectorAll('.subscribe-btn');
+    const unsubscribeBtn = document.getElementById('unsubscribeBtn');
+    
+    let currentAction = null;
+    let currentPlan = null;
+    
+    // Fonction pour ouvrir le modal
+    function openModal(title, message, action, plan = null) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      currentAction = action;
+      currentPlan = plan;
+      confirmationModal.classList.remove('hidden');
+    }
+    
+    // Fonction pour fermer le modal
+    function closeModal() {
+      confirmationModal.classList.add('hidden');
+      currentAction = null;
+      currentPlan = null;
+    }
+    
+    // Gérer les clics sur les boutons d'abonnement
+    subscribeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const plan = {
+          duration: parseInt(this.getAttribute('data-plan')),
+          price: parseFloat(this.getAttribute('data-price')),
+          name: this.getAttribute('data-name')
+        };
+        
+        openModal(
+          `S'abonner au plan ${plan.name}`,
+          `Vous êtes sur le point de vous abonner au plan ${plan.name} pour ${plan.price} DT. Voulez-vous continuer ?`,
+          'subscribe',
+          plan
+        );
+      });
+    });
+    
+    // Gérer le clic sur le bouton de désabonnement
+    if (unsubscribeBtn) {
+      unsubscribeBtn.addEventListener('click', function() {
+        openModal(
+          'Confirmer le désabonnement',
+          'Êtes-vous sûr de vouloir vous désabonner du service SMS ? Vous ne recevrez plus d\'alertes pour les nouvelles offres d\'emploi.',
+          'unsubscribe'
+        );
+      });
+    }
+    
+    // Gérer le clic sur le bouton de confirmation du modal
+    confirmModalBtn.addEventListener('click', function() {
+      if (currentAction === 'subscribe' && currentPlan) {
+        // Envoyer la requête d'abonnement
+        fetch('/abonnement/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            duration: currentPlan.duration,
+            price: currentPlan.price
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          closeModal();
+          
+          if (data.success) {
+            window.location.href = '/abonnement?success=true&message=' + encodeURIComponent(data.message);
+          } else {
+            window.location.href = '/abonnement?success=false&message=' + encodeURIComponent(data.message);
+          }
+        })
+        .catch(error => {
+          closeModal();
+          console.error('Erreur:', error);
+          window.location.href = '/abonnement?success=false&message=' + encodeURIComponent('Une erreur est survenue lors de l\'abonnement');
+        });
+      } else if (currentAction === 'unsubscribe') {
+        // Envoyer la requête de désabonnement
+        fetch('/abonnement/unsubscribe', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          closeModal();
+          
+          if (data.success) {
+            window.location.href = '/abonnement?success=true&message=' + encodeURIComponent(data.message);
+          } else {
+            window.location.href = '/abonnement?success=false&message=' + encodeURIComponent(data.message);
+          }
+        })
+        .catch(error => {
+          closeModal();
+          console.error('Erreur:', error);
+          window.location.href = '/abonnement?success=false&message=' + encodeURIComponent('Une erreur est survenue lors du désabonnement');
+        });
+      }
+    });
+    
+    // Gérer le clic sur le bouton d'annulation du modal
+    cancelModalBtn.addEventListener('click', closeModal);
+    
+    // Fermer le modal si on clique en dehors
+    confirmationModal.addEventListener('click', function(event) {
+      if (event.target === confirmationModal) {
+        closeModal();
+      }
+    });
+  });
+</script>
+
+
+ <!-- Footer -->
+    {{>footer }} <!-- Include footer partial -->
+ 
+</body>
+</html>

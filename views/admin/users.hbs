@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body class="bg-gray-100">
+  <div class="flex h-screen">
+    {{> sidebar }} <!-- Sidebar Partial -->
+    <div class="flex-1 flex flex-col">
+      {{> header }} <!-- Header Partial -->
+
+      <main class="p-6">
+        <div class="bg-white shadow p-4 flex justify-between items-center">
+          <h1 class="text-xl font-semibold">Gestion des utilisateurs</h1>
+          <button id="addUserBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700">Add User</button>
+        </div>
+        
+        <div class="bg-white p-6 shadow rounded-lg mt-4">
+          <div id="loader" class="text-center py-4 hidden">
+            <p class="text-gray-600">Loading users...</p>
+          </div>
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-200 text-gray-600">
+                <th class="p-3 border">Name</th>
+                <th class="p-3 border">Email</th>
+                <th class="p-3 border">Phone</th>
+                <th class="p-3 border">Governorate</th>
+                <th class="p-3 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTable" class="bg-white"></tbody>
+          </table>
+
+          <!-- Pagination Controls -->
+          <div class="flex justify-between items-center mt-4">
+            <button id="prevPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50">Previous</button>
+            <span id="pageInfo" class="text-gray-600"></span>
+            <button id="nextPage" class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50">Next</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 class="text-xl font-semibold mb-4">Add User</h2>
+      <form id="addUserForm">
+        <input type="hidden" id="addUserId" />
+        <div class="mb-4">
+          <label class="block text-gray-700">First Name</label>
+          <input type="text" id="addPrenom" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Last Name</label>
+          <input type="text" id="addNom" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Email</label>
+          <input type="email" id="addEmail" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Password</label>
+          <input type="password" id="addPassword" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Phone Number</label>
+          <input type="text" id="addTelephone" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Governorate</label>
+          <input type="text" id="addGouvernorat" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="closeAddModal" class="px-4 py-2 bg-gray-400 text-white rounded">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="editUserModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 class="text-xl font-semibold mb-4">Edit User</h2>
+      <form id="editUserForm">
+        <input type="hidden" id="editUserId" />
+        <div class="mb-4">
+          <label class="block text-gray-700">First Name</label>
+          <input type="text" id="editPrenom" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Last Name</label>
+          <input type="text" id="editNom" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Email</label>
+          <input type="email" id="editEmail" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Phone Number</label>
+          <input type="text" id="editTelephone" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Governorate</label>
+          <input type="text" id="editGouvernorat" class="w-full p-2 border rounded" required />
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="closeEditModal" class="px-4 py-2 bg-gray-400 text-white rounded">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+    const userTable = document.getElementById('userTable');
+    const loader = document.getElementById('loader');
+    const addUserModal = document.getElementById('addUserModal');
+    const editUserModal = document.getElementById('editUserModal');
+    const addUserForm = document.getElementById('addUserForm');
+    const editUserForm = document.getElementById('editUserForm');
+
+    const addUserId = document.getElementById('addUserId');
+    const addPrenom = document.getElementById('addPrenom');
+    const addNom = document.getElementById('addNom');
+    const addEmail = document.getElementById('addEmail');
+    const addPassword = document.getElementById('addPassword');
+    const addTelephone = document.getElementById('addTelephone');
+    const addGouvernorat = document.getElementById('addGouvernorat');
+
+    const editUserId = document.getElementById('editUserId');
+    const editPrenom = document.getElementById('editPrenom');
+    const editNom = document.getElementById('editNom');
+    const editEmail = document.getElementById('editEmail');
+    const editTelephone = document.getElementById('editTelephone');
+    const editGouvernorat = document.getElementById('editGouvernorat');
+
+    let users = [];
+    let currentPage = 1;
+    const usersPerPage = 5;
+
+    document.getElementById('addUserBtn').addEventListener('click', () => {
+        addUserForm.reset();
+        addUserModal.classList.remove('hidden');
+    });
+
+    document.getElementById('closeAddModal').addEventListener('click', () => {
+        addUserModal.classList.add('hidden');
+    });
+
+    document.getElementById('closeEditModal').addEventListener('click', () => {
+        editUserModal.classList.add('hidden');
+    });
+
+function deleteUser(id) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/delete-user/${id}`, {
+                method: "DELETE",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the offres array by removing the deleted offer
+                    offres = users.filter(offre => offre.id !== id);
+                    
+                    // Explicitly re-render the table to reflect changes
+                    fetchUsers(); 
+
+                    Swal.fire(
+                        "Deleted!",
+                        "user has been deleted.",
+                        "success"
+                    );
+                } else {
+                    Swal.fire(
+                        "Error!",
+                        "Failed to delete the offer.",
+                        "error"
+                    );
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire("Error!", "An unexpected error occurred.", "error");
+            });
+        }
+    });
+}
+
+
+
+addUserForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const user = {
+        prenom: addPrenom.value,
+        nom: addNom.value,
+        email: addEmail.value,
+        password: addPassword.value,
+        telephone: addTelephone.value,
+        gouvernorat: addGouvernorat.value
+    };
+
+    try {
+        const response = await fetch('/create-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            // Success: User created successfully
+            Swal.fire({
+                icon: 'success',
+                title: 'User Created',
+                text: 'The user was created successfully!',
+            }).then(() => {
+                fetchUsers();
+                addUserModal.classList.add('hidden');
+            });
+        } else {
+            // Error: Email already exists or other errors
+            if (result.message === 'Email already exists') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'The email already exists. Please choose another one.',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message,
+                });
+            }
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'There was an issue creating the user.',
+        });
+    }
+});
+
+    editUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const user = {
+            prenom: editPrenom.value,
+            nom: editNom.value,
+            email: editEmail.value,
+            telephone: editTelephone.value,
+            gouvernorat: editGouvernorat.value
+        };
+
+        try {
+            const response = await fetch('/update-user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: editUserId.value, ...user })
+            });
+            const result = await response.json();
+            if (result.success) {
+                fetchUsers();
+                editUserModal.classList.add('hidden');
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            alert('Error updating user.');
+        }
+    });
+
+    async function fetchUsers() {
+        loader.classList.remove('hidden');
+        try {
+            const response = await fetch('/display-user');
+            const data = await response.json();
+            users = data.user;
+            renderUsers();
+        } catch (error) {
+            console.error('Failed to fetch users', error);
+            userTable.innerHTML = `<tr><td colspan="6" class="text-center text-red-500">Failed to load users</td></tr>`;
+        } finally {
+            loader.classList.add('hidden');
+        }
+    }
+
+    async function editUser(email) {
+    // Find the user by ID
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+        console.error("User not found:", id);
+        alert("User not found!");
+        return;
+    }
+
+    // Debugging: Log the found user object
+    console.log("Found user:", user);
+
+    // Populate the modal with the user's data
+    editUserId.value = user.id;
+    editPrenom.value = user.prenom;
+    editNom.value = user.nom;
+    editEmail.value = user.email;
+    editTelephone.value = user.numero_telephone;
+    editGouvernorat.value = user.gouvernorat;
+
+    // Show the modal
+    editUserModal.classList.remove('hidden');
+}
+
+
+    function renderUsers() {
+        const start = (currentPage - 1) * usersPerPage;
+        const end = start + usersPerPage;
+        const paginatedUsers = users.slice(start, end);
+
+        userTable.innerHTML = paginatedUsers.filter(user => user.email !== "admin@vip.tn")
+            .map(user => `
+                <tr class="border hover:bg-gray-100 transition">
+                    <td class="p-3 border">${user.prenom} ${user.nom}</td>
+                    <td class="p-3 border">${user.email}</td>
+                    <td class="p-3 border">${user.numero_telephone}</td>
+                    <td class="p-3 border">${user.gouvernorat}</td>
+                    <td class="p-3 border">
+                        <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded" data-id="${user.email}"> 
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16.862 3.487a1.657 1.657 0 012.343 0l1.308 1.308a1.657 1.657 0 010 2.343l-1.497 1.497-3.65-3.65 1.496-1.497zM3 16.25V21h4.75l10.458-10.458-4.75-4.75L3 16.25z"/>
+    </svg></button>
+                        <button onclick="deleteUser('${user.id}')" class="px-3 py-1 bg-red-600 text-white rounded"><svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        class="h-4 w-4" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+      >
+        <path d="M5 20a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8h2V6h-4V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H3v2h2zM9 4h6v2H9zm9 16H6V8h12z"/>
+      </svg></button>
+                    </td>
+                </tr>
+            `).join('');
+
+        // Add event listeners to all edit buttons
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const userId = event.target.getAttribute('data-id');
+                editUser(userId);
+            });
+        });
+
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${Math.ceil(users.length / usersPerPage)}`;
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderUsers();
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        if (currentPage < Math.ceil(users.length / usersPerPage)) {
+            currentPage++;
+            renderUsers();
+        }
+    });
+
+    // Initial Fetch
+    fetchUsers();
+</script>
+</body>
+</html>
