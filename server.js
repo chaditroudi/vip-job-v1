@@ -3,6 +3,7 @@ const exphbs = require("express-handlebars");
 const socketIO = require('socket.io');
 const bodyParser = require("body-parser");
 const mysql = require("mysql2");
+const axios = require('axios');
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const path = require("path");
@@ -1200,5 +1201,53 @@ app.get('/favorites/:userId', (req, res) => {
     res.status(200).json(results);
   });
 });
+
+app.post('/generate-bio', async (req, res) => {
+  const { bio } = req.body;
+
+  if (!bio) {
+    return res.status(400).json({ error: 'Bio input is required' });
+  }
+
+  try {
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'mistralai/mistral-7b-instruct', // ✅ FREE MODEL
+        messages: [
+          {
+            role: 'system',
+            content: 'Vous êtes un assistant professionnel qui aide à améliorer les biographies pour les carrières.',
+          },
+          {
+            role: 'user',
+            content: `Améliore ce texte de biographie professionnelle en français : ${bio}`,
+          },
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'http://localhost:3001', // change if deployed
+          'X-Title': 'VIP Job Bio Generator',
+        },
+      }
+    );
+
+    let result = response.data.choices[0].message.content;
+
+    // 🔥 Nettoyage dynamique de l'intro automatique (FR / EN)
+    result = result.replace(/^[^:]*:\s*/, '');
+
+
+    console.log(result);
+    return res.json({ result });
+  } catch (error) {
+    console.error('Error generating bio:', error?.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to generate bio' });
+  }
+});
+
 
 server.listen(3001, () => console.log("✅ Server is running on port 3001"));
