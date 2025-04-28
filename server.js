@@ -762,15 +762,15 @@ app.put('/update-user', (req, res) => {
   });
 });
 
-app.post('/create-offre', (req, res) => {
+app.post('/create-offre', upload.single('image'), (req, res) => {
   const { titre, description, date_creation, date_fin, domaine, type_contrat, localisation, nb_candidat, status } = req.body;
+  const image = req.file ? req.file.filename : null;
 
-  // SQL query to insert the new offer
   const sql = `
-    INSERT INTO offreemploi (titre, description, date_creation, date_fin, domaine, type_contrat, localisation, nb_candidat,status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+    INSERT INTO offreemploi (titre, description, date_creation, date_fin, domaine, type_contrat, localisation, nb_candidat, status, image)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
-  const values = [titre, description, date_creation, date_fin, domaine, type_contrat, localisation, nb_candidat, status];
+  const values = [titre, description, date_creation, date_fin, domaine, type_contrat, localisation, nb_candidat, status, image];
 
   db.query(sql, values, (err, result) => {
     if (err) {
@@ -778,13 +778,14 @@ app.post('/create-offre', (req, res) => {
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 
-    res.status(201).json({
-      success: true,
-      message: 'Offre created successfully',
-      offreId: result.insertId
+    res.status(201).json({ 
+      success: true, 
+      message: 'Offre créée avec succès', 
+      offreId: result.insertId 
     });
   });
 });
+
 
 app.get('/display-offres', (req, res) => {
   const query = "SELECT * FROM offreemploi";
