@@ -61,10 +61,10 @@ io.on("connection", (socket) => {
 
 // Configuration de la base de données
 const db = mysql.createConnection({
-  host: "localhost",
+  host: "mysql",
   user: "root",
   password: "", // Mot de passe de votre base de données
-  database: "vipjob", // Nom de la base de données
+  database: "vipjob", 
 });
 
 // Middleware to parse JSON bodies
@@ -171,6 +171,10 @@ app.get("/profile", (req, res) => {
   });
   // Afficher la page de tableau de bord
   res.render("user/profile", { title: "Tableau de bord - VipJob.tn", user: req.session.user });
+});
+
+app.get("/reset-password", (req, res) => {
+  res.render("user/reset-password");
 });
 
 // Route pour gérer la déconnexion
@@ -379,7 +383,8 @@ app.post("/forgot-password", (req, res) => {
           }
           console.log("E-mail envoyé:", info.response);
 
-          res.render('success-alert');
+          return res.render("user/login", { title: "Connexion - VipJob.tn" });
+
         });
       }
     );
@@ -662,10 +667,10 @@ app.post('/create-user', (req, res) => {
 
     // SQL query pour ajouter l'utilisateur
     const sql = `
-      INSERT INTO utilisateur (prenom, nom, email, mot_de_passe, numero_telephone, gouvernorat)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO utilisateur (prenom, nom, email, mot_de_passe, numero_telephone, gouvernorat,etat)
+      VALUES (?, ?, ?, ?, ?, ?,?)
     `;
-    const values = [prenom, nom, email, hashedPassword, telephone, gouvernorat];
+    const values = [prenom, nom, email, hashedPassword, telephone, gouvernorat,1];
 
     db.query(sql, values, (err, result) => {
       if (err) {
@@ -1248,6 +1253,41 @@ app.post('/generate-bio', async (req, res) => {
     console.error('Error generating bio:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Failed to generate bio' });
   }
+});
+
+
+// Endpoint to get job postings per month
+app.get('/job-postings-per-month', (req, res) => {
+  const query = `
+    SELECT MONTH(posted_date) AS month, COUNT(*) AS num_postings
+    FROM job_postings
+    GROUP BY MONTH(posted_date)
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching job postings:', err);
+      return res.status(500).json({ message: 'Error fetching data' });
+    }
+    res.json(results); // Return the results for charting
+  });
+});
+
+// Endpoint to get job applications per month
+app.get('/job-applications-per-month', (req, res) => {
+  const query = `
+    SELECT MONTH(application_date) AS month, COUNT(*) AS num_applications
+    FROM job_applications
+    GROUP BY MONTH(application_date)
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching job applications:', err);
+      return res.status(500).json({ message: 'Error fetching data' });
+    }
+    res.json(results);
+  });
 });
 
 

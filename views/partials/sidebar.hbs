@@ -1,38 +1,45 @@
-<div class="w-72 bg-gray-900 text-white p-6 flex flex-col space-y-6 shadow-lg">
-  <div class="flex items-center space-x-3">
-    <img src="assets/img/job.png" alt="Logo" class="h-12 w-12 object-cover align-middle">
-    <span class="text-3xl font-bold tracking-wide">VIPJOB.TN</span>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Sidebar -->
+<aside class="w-72 min-h-screen bg-slate-900 text-white flex flex-col justify-between p-5 shadow-2xl">
+  <!-- Top: Logo & Title -->
+  <div>
+    <div class="flex items-center gap-3 mb-6">
+      <img src="assets/img/job.png" alt="Logo" class="h-12 w-12 rounded-full object-cover bg-white p-2 ">
+      <span class="text-xl font-semibold tracking-tight">VIPJOB.TN</span>
+    </div>
+    <hr class="border-t border-gray-700">
+    
+    <nav class="flex flex-col gap-1 mt-4">
+      <!-- Dashboard -->
+      <a href="/index" class="group flex items-center gap-3 p-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-indigo-600 hover:text-white">
+        <i class="fas fa-house text-lg group-hover:scale-110 transform transition"></i>
+        <span class="text-sm font-medium">Dashboard</span>
+      </a>
+
+      <!-- Users -->
+      <a href="/users" class="group flex items-center gap-3 p-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-indigo-600 hover:text-white">
+        <i class="fas fa-users text-lg group-hover:scale-110 transform transition"></i>
+        <span class="text-sm font-medium">Utilisateurs</span>
+      </a>
+
+      <!-- Jobs -->
+      <a href="/offres" class="group flex items-center gap-3 p-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-indigo-600 hover:text-white">
+        <i class="fas fa-briefcase text-lg group-hover:scale-110 transform transition"></i>
+        <span class="text-sm font-medium">Offres d'emploi</span>
+      </a>
+
+      <!-- Settings -->
+      <a href="#" class="group flex items-center gap-3 p-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-indigo-600 hover:text-white">
+        <i class="fas fa-cog text-lg group-hover:scale-110 transform transition"></i>
+        <span class="text-sm font-medium">Paramètres</span>
+      </a>
+    </nav>
   </div>
-  <hr class="border-gray-700" />
-  <nav class="space-y-2">
-    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-3 rounded-lg transition-all duration-300">
-      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path d="M12 4v16m8-8H4"></path>
-      </svg>
-      <span class="text-lg">Dashboard</span>
-    </a>
-    <a href="/users" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-3 rounded-lg transition-all duration-300">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-  <circle cx="12" cy="7" r="4"></circle>
-</svg>
-      <span class="text-lg">Gestion des utilisateurs</span>
-    </a>
-    <a href="/offres" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-3 rounded-lg transition-all duration-300">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-  <circle cx="12" cy="7" r="4"></circle>
-  <line x1="12" y1="13" x2="12" y2="16"></line>
-  <line x1="15" y1="16" x2="9" y2="16"></line>
-</svg>
-      <span class="text-lg">Offre Emploi</span>
-    </a>
-    <a href="#" class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-3 rounded-lg transition-all duration-300">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <circle cx="12" cy="12" r="3"></circle>
-  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-</svg>
-      <span class="text-lg">paramètres</span>
-    </a>
-  </nav>
-</div>
+
+  <!-- Bottom: Footer -->
+  <div class="text-xs text-slate-500 mt-8">
+    &copy; 2025 VIPJOB.TN — All rights reserved
+  </div>
+</aside>

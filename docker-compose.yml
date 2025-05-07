@@ -1,12 +1,12 @@
+version: '3.7'
+
 services:
   mysql:
     image: mysql:5.7
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "root123"  # Changed to a simpler password for development
-      MYSQL_DATABASE: vipjob
-      MYSQL_USER: "vipjob_user"
-      MYSQL_PASSWORD: "vipjob123"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: vipjob  # You can leave this as is, or set it to your database name
     ports:
       - "3306:3306"
     volumes:
@@ -15,36 +15,47 @@ services:
     networks:
       - vipjob-network
 
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    container_name: n8n
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=troudishedy6@gmail.com
-      - N8N_BASIC_AUTH_PASSWORD=chadi1A&
-      - DB_TYPE=mysql
-      - DB_MYSQL_HOST=mysql
-      - DB_MYSQL_PORT=3306
-      - DB_MYSQL_DATABASE=vipjob
-      - DB_MYSQL_USER=vipjob_user
-      - DB_MYSQL_PASSWORD=vipjob123
-      - N8N_HOST=${N8N_HOST:-localhost}
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
-      - NODE_ENV=production
-    ports:
-      - "5678:5678"
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vipjob-node
+    working_dir: /app
     volumes:
-      - n8n_data:/home/node/.n8n
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3001:3001"
     depends_on:
       - mysql
-    restart: always
+
+    command: sh -c "npx wait-on tcp:mysql:3306 && node server.js"
+
+    networks:
+      - vipjob-network
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""  # No password for root user
+      DB_NAME: vipjob
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: job-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ""  # No password for root user
+    depends_on:
+      - mysql
     networks:
       - vipjob-network
 
 volumes:
   mysql_data:
-  n8n_data:
 
 networks:
   vipjob-network:
